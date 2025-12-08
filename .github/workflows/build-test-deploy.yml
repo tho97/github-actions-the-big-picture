@@ -40,7 +40,7 @@ jobs:
 
     environment:
       name: production
-      url: ${{step.deplyoment.outputs.page_url}} # Snags the URL from the final deployment step
+      url: ${{steps.deplyoment.outputs.page_url}} # Snags the URL from the final deployment step
     
     runs-on: ubuntu-latest
     
