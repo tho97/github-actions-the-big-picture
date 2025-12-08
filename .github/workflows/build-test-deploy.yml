@@ -29,3 +29,40 @@ jobs:
           node-version: '20.x'
       - run: npm install
       - run: npm test
+
+  deploy:
+    needs: test
+
+    permissions: # Sets the permissions for GitHub pages
+      contents: write
+      pages: write
+      id-token: write
+
+    environment:
+      name: production
+      url: ${{step.deplyoment.outputs.page_url}} # Snags the URL from the final deployment step
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{secrets.GITHUB_TOKEN}} # The token is provided by GitHub actions
+      - name: use node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: configure github pages
+        uses: actions/configure-pages@v4
+        with:
+          static_site_generator: next
+      - run: npm install
+      - run: npn run build
+      - name: upload artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './out'
+      - name: deploy
+        id: deployment # Giving this step an id, allows us to access properties from this step (see the 'checkout repo' step)
+        uses: actions/deploy-pages@v4
